@@ -19,17 +19,22 @@ import {
   FileText,
   Code,
   Zap,
-  Filter
+  Filter,
+  Users,
+  TrendingUp,
+  Building,
+  DollarSign,
+  Settings as SettingsIcon
 } from "lucide-react";
 
 // Mock data for demonstration
 const mockApps = [
   {
     id: 1,
-    name: "Photo Collage Creator",
-    description: "Create stunning photo collages with AI assistance",
-    category: "creativity",
-    icon: "🎨",
+    name: "Social Media Manager",
+    description: "Automate your social media posts and engagement",
+    category: "marketing",
+    icon: "📱",
     color: "bg-gradient-to-br from-orange-100 to-pink-100",
     downloads: "1.2M",
     rating: 4.8,
@@ -37,10 +42,10 @@ const mockApps = [
   },
   {
     id: 2,
-    name: "AI Writing Assistant",
-    description: "Enhance your writing with AI-powered suggestions",
-    category: "productivity",
-    icon: "✍️",
+    name: "Lead Generator",
+    description: "AI-powered lead generation and qualification",
+    category: "sales",
+    icon: "🎯",
     color: "bg-gradient-to-br from-blue-100 to-purple-100",
     downloads: "850K",
     rating: 4.9,
@@ -48,10 +53,10 @@ const mockApps = [
   },
   {
     id: 3,
-    name: "Smart Analytics",
-    description: "Generate insights from your data instantly",
-    category: "business",
-    icon: "📊",
+    name: "Project Tracker",
+    description: "Smart project management and team coordination",
+    category: "operations",
+    icon: "📋",
     color: "bg-gradient-to-br from-green-100 to-emerald-100",
     downloads: "650K",
     rating: 4.7,
@@ -59,10 +64,10 @@ const mockApps = [
   },
   {
     id: 4,
-    name: "Voice Transcriber",
-    description: "Convert speech to text with high accuracy",
-    category: "productivity",
-    icon: "🎙️",
+    name: "Expense Analyzer",
+    description: "Automated expense categorization and reporting",
+    category: "finance",
+    icon: "💰",
     color: "bg-gradient-to-br from-indigo-100 to-cyan-100",
     downloads: "420K",
     rating: 4.6,
@@ -70,10 +75,10 @@ const mockApps = [
   },
   {
     id: 5,
-    name: "Image Generator",
-    description: "Create unique images from text descriptions",
-    category: "creativity",
-    icon: "🖼️",
+    name: "Recruitment Assistant",
+    description: "AI-powered candidate screening and matching",
+    category: "hr",
+    icon: "👥",
     color: "bg-gradient-to-br from-purple-100 to-pink-100",
     downloads: "380K",
     rating: 4.5,
@@ -81,13 +86,24 @@ const mockApps = [
   },
   {
     id: 6,
-    name: "Code Assistant",
-    description: "AI-powered coding help and suggestions",
-    category: "development",
-    icon: "💻",
+    name: "Network Monitor",
+    description: "Real-time network monitoring and alerts",
+    category: "it",
+    icon: "🔧",
     color: "bg-gradient-to-br from-gray-100 to-slate-100",
     downloads: "290K",
     rating: 4.4,
+    featured: false
+  },
+  {
+    id: 7,
+    name: "Document Scanner",
+    description: "OCR and document digitization tool",
+    category: "other",
+    icon: "📄",
+    color: "bg-gradient-to-br from-yellow-100 to-orange-100",
+    downloads: "180K",
+    rating: 4.3,
     featured: false
   }
 ];
@@ -109,11 +125,13 @@ export default function Marketplace() {
 
   const categories = [
     { id: "all", name: "All", icon: Filter },
-    { id: "creativity", name: "Creative", icon: Palette },
-    { id: "productivity", name: "Productivity", icon: Zap },
-    { id: "business", name: "Business", icon: BarChart },
-    { id: "development", name: "Development", icon: Code },
-    { id: "education", name: "Education", icon: FileText },
+    { id: "marketing", name: "Marketing", icon: TrendingUp },
+    { id: "sales", name: "Sales", icon: Zap },
+    { id: "operations", name: "Operations", icon: Building },
+    { id: "finance", name: "Finance", icon: DollarSign },
+    { id: "hr", name: "HR", icon: Users },
+    { id: "it", name: "IT", icon: SettingsIcon },
+    { id: "other", name: "Other", icon: Filter },
   ];
 
   const filteredApps = applications.filter((app: any) => {
@@ -171,7 +189,7 @@ export default function Marketplace() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Category Tabs */}
         <Tabs value={selectedCategory} onValueChange={setSelectedCategory} className="mb-8">
-          <TabsList className="grid w-full grid-cols-6 bg-white border">
+          <TabsList className="grid w-full grid-cols-8 bg-white border">
             {categories.map((category) => (
               <TabsTrigger 
                 key={category.id} 
