@@ -8,9 +8,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { Plus, Key, Eye, EyeOff, Trash2, Edit } from "lucide-react";
+import { Plus, Key, Eye, EyeOff, Trash2, Edit, Shield, AlertTriangle } from "lucide-react";
 import type { ApiKeyData } from "@shared/schema";
 
 interface ApiKey {
@@ -204,6 +205,15 @@ export function ApiKeyManagement() {
           </DialogContent>
         </Dialog>
       </div>
+
+      {/* Security Alert */}
+      <Alert>
+        <Shield className="h-4 w-4" />
+        <AlertDescription>
+          <strong>Security Notice:</strong> Your API keys are encrypted with AES-256-GCM and stored securely. 
+          We never store your keys in plain text. Only add keys from trusted AI providers and never share them.
+        </AlertDescription>
+      </Alert>
 
       {isLoading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

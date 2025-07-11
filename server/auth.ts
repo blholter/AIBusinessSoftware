@@ -8,6 +8,7 @@ import { promisify } from "util";
 import { storage } from "./storage";
 import { User } from "@shared/schema";
 import connectPg from "connect-pg-simple";
+import { authLimiter, sessionSecurity, auditLog } from "./security";
 
 declare global {
   namespace Express {
@@ -39,9 +40,7 @@ export function setupAuth(app: Express) {
   });
 
   const sessionSettings: session.SessionOptions = {
-    secret: process.env.SESSION_SECRET || "your-secret-key",
-    resave: false,
-    saveUninitialized: false,
+    ...sessionSecurity,
     store: sessionStore,
     cookie: {
       secure: process.env.NODE_ENV === "production",
@@ -137,7 +136,7 @@ export function setupAuth(app: Express) {
   });
 
   // Auth Routes
-  app.post("/api/register", async (req, res, next) => {
+  app.post("/api/register", authLimiter, async (req, res, next) => {
     try {
       const { email, username, password, firstName, lastName } = req.body;
 
@@ -179,15 +178,49 @@ export function setupAuth(app: Express) {
     }
   });
 
-  app.post("/api/login", passport.authenticate("local"), (req, res) => {
-    const user = req.user as User;
-    res.json({ 
-      id: user.id,
-      email: user.email,
-      username: user.username,
-      firstName: user.firstName,
-      lastName: user.lastName,
-    });
+  app.post("/api/login", authLimiter, (req, res, next) => {
+    passport.authenticate("local", (err: any, user: any, info: any) => {
+      if (err) {
+        auditLog('LOGIN_ERROR', null, {
+          ip: req.ip,
+          error: err.message,
+          userAgent: req.get('User-Agent'),
+        });
+        return next(err);
+      }
+      
+      if (!user) {
+        auditLog('LOGIN_FAILED', null, {
+          ip: req.ip,
+          username: req.body.username,
+          userAgent: req.get('User-Agent'),
+        });
+        return res.status(401).json({ error: "Invalid credentials" });
+      }
+      
+      req.logIn(user, (err) => {
+        if (err) {
+          auditLog('LOGIN_SESSION_ERROR', user.id, {
+            ip: req.ip,
+            error: err.message,
+          });
+          return next(err);
+        }
+        
+        auditLog('LOGIN_SUCCESS', user.id, {
+          ip: req.ip,
+          userAgent: req.get('User-Agent'),
+        });
+        
+        res.status(200).json({
+          id: user.id,
+          email: user.email,
+          username: user.username,
+          firstName: user.firstName,
+          lastName: user.lastName,
+        });
+      });
+    })(req, res, next);
   });
 
   app.get("/api/auth/google", passport.authenticate("google", { scope: ["profile", "email"] }));
@@ -201,8 +234,15 @@ export function setupAuth(app: Express) {
   );
 
   app.post("/api/logout", (req, res, next) => {
+    const userId = req.user?.id || null;
     req.logout((err) => {
       if (err) return next(err);
+      
+      auditLog('LOGOUT_SUCCESS', userId, {
+        ip: req.ip,
+        userAgent: req.get('User-Agent'),
+      });
+      
       res.sendStatus(200);
     });
   });
