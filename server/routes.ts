@@ -4,8 +4,18 @@ import { storage } from "./storage";
 import { setupAuth } from "./auth";
 import { insertUserSchema, apiKeySchema } from "@shared/schema";
 import { encryptApiKey, decryptApiKey, maskApiKey } from "./encryption";
+import { 
+  authLimiter, 
+  apiLimiter, 
+  strictLimiter, 
+  securityHeaders, 
+  validateInput, 
+  validateApiKey, 
+  enhancedAuth, 
+  auditLog 
+} from "./security";
 
-// Authentication middleware
+// Legacy authentication middleware (keeping for backward compatibility)
 const isAuthenticated = (req: any, res: any, next: any) => {
   if (!req.isAuthenticated()) {
     return res.status(401).json({ error: "Not authenticated" });
@@ -14,11 +24,16 @@ const isAuthenticated = (req: any, res: any, next: any) => {
 };
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Apply security middleware
+  app.use(securityHeaders);
+  app.use(validateInput);
+  app.use('/api', apiLimiter);
+  
   // Setup authentication
   setupAuth(app);
 
   // User profile update
-  app.put('/api/user/profile', isAuthenticated, async (req: any, res) => {
+  app.put('/api/user/profile', strictLimiter, enhancedAuth, async (req: any, res) => {
     try {
       const userId = req.user.id;
       const updateData = insertUserSchema.parse(req.body);
@@ -47,7 +62,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // API Key management routes
-  app.get('/api/user/api-keys', isAuthenticated, async (req: any, res) => {
+  app.get('/api/user/api-keys', enhancedAuth, async (req: any, res) => {
     try {
       const userId = req.user.id;
       const apiKeys = await storage.getUserApiKeys(userId);
@@ -65,10 +80,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/user/api-keys', isAuthenticated, async (req: any, res) => {
+  app.post('/api/user/api-keys', strictLimiter, enhancedAuth, async (req: any, res) => {
     try {
       const userId = req.user.id;
       const keyData = apiKeySchema.parse(req.body);
+      
+      // Validate API key format
+      if (!validateApiKey(keyData.apiKey)) {
+        auditLog('INVALID_API_KEY_ATTEMPT', userId, {
+          ip: req.ip,
+          provider: keyData.provider,
+        });
+        return res.status(400).json({ message: "Invalid API key format" });
+      }
       
       const encryptedKey = encryptApiKey(keyData.apiKey);
       
@@ -90,7 +114,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put('/api/user/api-keys/:id', isAuthenticated, async (req: any, res) => {
+  app.put('/api/user/api-keys/:id', strictLimiter, enhancedAuth, async (req: any, res) => {
     try {
       const userId = req.user.id;
       const keyId = parseInt(req.params.id);
@@ -121,7 +145,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/user/api-keys/:id', isAuthenticated, async (req: any, res) => {
+  app.delete('/api/user/api-keys/:id', strictLimiter, enhancedAuth, async (req: any, res) => {
     try {
       const userId = req.user.id;
       const keyId = parseInt(req.params.id);

@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Bot, ArrowLeft, LogOut, User, Bell, Shield, CreditCard, Settings as SettingsIcon, Upload, X, Key } from "lucide-react";
 import { ApiKeyManagement } from "@/components/api-key-management";
+import { SecurityDashboard } from "@/components/security-dashboard";
 import { isUnauthorizedError } from "@/lib/authUtils";
 
 export default function Settings() {
@@ -309,12 +310,7 @@ export default function Settings() {
             )}
             
             {activeTab === "security" && (
-              <Card>
-                <CardContent className="p-6">
-                  <h2 className="text-xl font-semibold text-gray-900 mb-6">Security Settings</h2>
-                  <p className="text-gray-600">Security settings coming soon...</p>
-                </CardContent>
-              </Card>
+              <SecurityDashboard />
             )}
           </div>
         </div>
