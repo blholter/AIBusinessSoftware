@@ -114,10 +114,13 @@ export default function Marketplace() {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [sortBy, setSortBy] = useState("popular");
 
-  const { data: applications = mockApps } = useQuery({
+  const { data: applications = mockApps, error } = useQuery({
     queryKey: ["/api/applications"],
     enabled: !!user,
   });
+
+  // Always use mockApps for now since the API returns empty array
+  const apps = applications && applications.length > 0 ? applications : mockApps;
 
   const handleLogout = () => {
     logoutMutation.mutate();
@@ -134,7 +137,7 @@ export default function Marketplace() {
     { id: "other", name: "Other", icon: Filter },
   ];
 
-  const filteredApps = applications.filter((app: any) => {
+  const filteredApps = apps.filter((app: any) => {
     const matchesSearch = app.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          app.description.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesCategory = selectedCategory === "all" || app.category === selectedCategory;
