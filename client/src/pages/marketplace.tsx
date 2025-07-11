@@ -158,7 +158,7 @@ export default function Marketplace() {
                 <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
                   <Sparkles className="h-5 w-5 text-white" />
                 </div>
-                <span className="text-xl font-bold text-gray-900">Add-ons</span>
+                <span className="text-xl font-bold text-gray-900">AI Marketplace</span>
               </div>
             </div>
 
@@ -166,7 +166,7 @@ export default function Marketplace() {
               <div className="relative">
                 <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                 <Input
-                  placeholder="Search everything"
+                  placeholder="Search apps"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="pl-10 bg-gray-50 border-gray-200"
@@ -254,7 +254,7 @@ export default function Marketplace() {
 
             <div>
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-gray-900">All add-ons</h2>
+                <h2 className="text-2xl font-bold text-gray-900">All apps</h2>
                 <Select value={sortBy} onValueChange={setSortBy}>
                   <SelectTrigger className="w-48">
                     <SelectValue placeholder="Sort by" />
