@@ -16,12 +16,6 @@ export default function AuthPage() {
   const { user, loginMutation, registerMutation } = useAuth();
   const [location, setLocation] = useLocation();
 
-  // Redirect if already logged in
-  if (user) {
-    setTimeout(() => setLocation("/"), 0);
-    return null;
-  }
-
   const loginForm = useForm({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -40,6 +34,12 @@ export default function AuthPage() {
       lastName: "",
     },
   });
+
+  // Redirect if already logged in
+  if (user) {
+    setTimeout(() => setLocation("/"), 0);
+    return null;
+  }
 
   const onLogin = (data: any) => {
     loginMutation.mutate(data);
