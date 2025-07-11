@@ -4,21 +4,33 @@ import { eq } from "drizzle-orm";
 
 // Storage interface for user operations
 export interface IStorage {
-  getUser(id: string): Promise<User | undefined>;
+  getUser(id: number): Promise<User | undefined>;
   getUserByEmail(email: string): Promise<User | undefined>;
+  getUserByUsername(username: string): Promise<User | undefined>;
+  getUserByGoogleId(googleId: string): Promise<User | undefined>;
   createUser(insertUser: InsertUser): Promise<User>;
   upsertUser(upsertUser: UpsertUser): Promise<User>;
 }
 
 // Database storage implementation
 export class DatabaseStorage implements IStorage {
-  async getUser(id: string): Promise<User | undefined> {
+  async getUser(id: number): Promise<User | undefined> {
     const [user] = await db.select().from(users).where(eq(users.id, id));
     return user || undefined;
   }
 
   async getUserByEmail(email: string): Promise<User | undefined> {
     const [user] = await db.select().from(users).where(eq(users.email, email));
+    return user || undefined;
+  }
+
+  async getUserByUsername(username: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.username, username));
+    return user || undefined;
+  }
+
+  async getUserByGoogleId(googleId: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.googleId, googleId));
     return user || undefined;
   }
 
@@ -31,19 +43,26 @@ export class DatabaseStorage implements IStorage {
   }
 
   async upsertUser(upsertUser: UpsertUser): Promise<User> {
+    if (upsertUser.email) {
+      const existingUser = await this.getUserByEmail(upsertUser.email);
+      if (existingUser) {
+        // Update existing user
+        const [user] = await db
+          .update(users)
+          .set({
+            ...upsertUser,
+            updatedAt: new Date(),
+          })
+          .where(eq(users.id, existingUser.id))
+          .returning();
+        return user;
+      }
+    }
+    
+    // Create new user
     const [user] = await db
       .insert(users)
       .values(upsertUser)
-      .onConflictDoUpdate({
-        target: users.id,
-        set: {
-          email: upsertUser.email,
-          firstName: upsertUser.firstName,
-          lastName: upsertUser.lastName,
-          profileImageUrl: upsertUser.profileImageUrl,
-          updatedAt: new Date(),
-        },
-      })
       .returning();
     return user;
   }

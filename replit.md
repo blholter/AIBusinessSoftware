@@ -2,7 +2,7 @@
 
 ## Overview
 
-This is a full-stack AI marketplace application built with React (frontend) and Express.js (backend). The application allows users to discover, browse, and manage AI applications through a modern web interface. It features user authentication via Replit Auth, a responsive UI built with shadcn/ui components, and a PostgreSQL database for data persistence.
+This is a full-stack AI marketplace application built with React (frontend) and Express.js (backend). The application allows users to discover, browse, and manage AI applications through a modern web interface. It features user authentication via email/password registration and Google OAuth, a responsive UI built with shadcn/ui components, and a PostgreSQL database for data persistence.
 
 ## User Preferences
 
@@ -35,15 +35,16 @@ Preferred communication style: Simple, everyday language.
 ## Key Components
 
 ### Authentication System
-- **Provider**: Replit Auth using OpenID Connect
-- **Session Storage**: PostgreSQL-backed session store
+- **Email/Password**: Secure password hashing with scrypt algorithm
+- **Google OAuth**: Integration with Google sign-in using passport-google-oauth20
+- **Session Storage**: PostgreSQL-backed session store with connect-pg-simple
 - **Middleware**: Custom authentication middleware for protected routes
-- **User Management**: Automatic user creation and profile management
+- **User Management**: Registration, login, logout, and profile management
 
 ### Database Schema
-- **Users Table**: Stores user profiles with social information
-- **Applications Table**: Stores AI application metadata
-- **Sessions Table**: Required for Replit Auth session management
+- **Users Table**: Stores user profiles with email, password, OAuth data, and profile information
+- **Applications Table**: Stores AI application metadata (name, description, category, etc.)
+- **Sessions Table**: Required for passport session management
 
 ### UI Components
 - **Design System**: shadcn/ui components for consistent design
@@ -59,8 +60,9 @@ Preferred communication style: Simple, everyday language.
 ## Data Flow
 
 1. **Authentication Flow**:
-   - User visits app → Redirected to Replit Auth if not authenticated
-   - Successful auth → User session created in PostgreSQL
+   - User visits app → Redirected to auth page if not authenticated
+   - Registration/Login → Password hashing and session creation
+   - Google OAuth → Automatic user creation/linking
    - Protected routes check session validity
 
 2. **Application Browsing**:
@@ -82,6 +84,8 @@ Preferred communication style: Simple, everyday language.
 - **@radix-ui/***: Accessible UI primitives
 - **express**: Web framework
 - **passport**: Authentication middleware
+- **passport-local**: Local authentication strategy
+- **passport-google-oauth20**: Google OAuth strategy
 
 ### Development Dependencies
 - **tsx**: TypeScript execution for development
@@ -99,8 +103,8 @@ Preferred communication style: Simple, everyday language.
 ### Environment Requirements
 - **DATABASE_URL**: PostgreSQL connection string (required)
 - **SESSION_SECRET**: Secret for session encryption
-- **REPLIT_DOMAINS**: Required for Replit Auth
-- **ISSUER_URL**: OpenID Connect issuer URL
+- **GOOGLE_CLIENT_ID**: Google OAuth client ID (optional)
+- **GOOGLE_CLIENT_SECRET**: Google OAuth client secret (optional)
 
 ### Production Deployment
 - Application runs on Node.js

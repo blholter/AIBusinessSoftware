@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/hooks/use-auth";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
@@ -13,7 +13,7 @@ import { isUnauthorizedError } from "@/lib/authUtils";
 
 export default function Settings() {
   const { toast } = useToast();
-  const { user, isAuthenticated, isLoading } = useAuth();
+  const { user, isLoading, logoutMutation } = useAuth();
   const queryClient = useQueryClient();
   const [formData, setFormData] = useState({
     firstName: "",
@@ -23,20 +23,7 @@ export default function Settings() {
     website: "",
   });
 
-  // Redirect to login if not authenticated
-  useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
-      toast({
-        title: "Unauthorized",
-        description: "You are logged out. Logging in again...",
-        variant: "destructive",
-      });
-      setTimeout(() => {
-        window.location.href = "/api/login";
-      }, 500);
-      return;
-    }
-  }, [isAuthenticated, isLoading, toast]);
+  // This page is protected by ProtectedRoute, so we don't need to check auth here
 
   // Initialize form data when user data loads
   useEffect(() => {
@@ -89,7 +76,7 @@ export default function Settings() {
   };
 
   const handleLogout = () => {
-    window.location.href = "/api/logout";
+    logoutMutation.mutate();
   };
 
   if (isLoading) {
