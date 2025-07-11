@@ -7,6 +7,7 @@ import {
   index,
   serial,
   integer,
+  boolean,
 } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
@@ -55,6 +56,18 @@ export const applications = pgTable("applications", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+// User API Keys table for BYOK (Bring Your Own Key) model
+export const userApiKeys = pgTable("user_api_keys", {
+  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  provider: varchar("provider").notNull(), // 'openai', 'anthropic', 'google', etc.
+  keyName: varchar("key_name").notNull(), // user-friendly name
+  encryptedKey: text("encrypted_key").notNull(), // encrypted API key
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 export const insertUserSchema = createInsertSchema(users).omit({
   id: true,
   createdAt: true,
@@ -80,10 +93,28 @@ export const insertApplicationSchema = createInsertSchema(applications).omit({
   updatedAt: true,
 });
 
+export const insertApiKeySchema = createInsertSchema(userApiKeys).omit({
+  id: true,
+  userId: true,
+  encryptedKey: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const apiKeySchema = z.object({
+  provider: z.enum(['openai', 'anthropic', 'google', 'azure', 'aws']),
+  keyName: z.string().min(1, 'Key name is required'),
+  apiKey: z.string().min(1, 'API key is required'),
+  isActive: z.boolean().default(true),
+});
+
 export type UpsertUser = typeof users.$inferInsert;
 export type User = typeof users.$inferSelect;
 export type Application = typeof applications.$inferSelect;
+export type UserApiKey = typeof userApiKeys.$inferSelect;
 export type InsertApplication = z.infer<typeof insertApplicationSchema>;
 export type InsertUser = z.infer<typeof insertUserSchema>;
+export type InsertApiKey = z.infer<typeof insertApiKeySchema>;
+export type ApiKeyData = z.infer<typeof apiKeySchema>;
 export type LoginData = z.infer<typeof loginSchema>;
 export type RegisterData = z.infer<typeof registerSchema>;

@@ -8,13 +8,15 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Bot, ArrowLeft, LogOut, User, Bell, Shield, CreditCard, Settings as SettingsIcon, Upload, X } from "lucide-react";
+import { Bot, ArrowLeft, LogOut, User, Bell, Shield, CreditCard, Settings as SettingsIcon, Upload, X, Key } from "lucide-react";
+import { ApiKeyManagement } from "@/components/api-key-management";
 import { isUnauthorizedError } from "@/lib/authUtils";
 
 export default function Settings() {
   const { toast } = useToast();
   const { user, isLoading, logoutMutation } = useAuth();
   const queryClient = useQueryClient();
+  const [activeTab, setActiveTab] = useState("profile");
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -134,21 +136,37 @@ export default function Settings() {
             <Card>
               <CardContent className="p-0">
                 <nav className="space-y-1">
-                  <Button variant="ghost" className="w-full justify-start bg-primary/10 text-primary hover:bg-primary/20">
+                  <Button 
+                    variant="ghost" 
+                    className={`w-full justify-start ${activeTab === "profile" ? "bg-primary/10 text-primary hover:bg-primary/20" : "text-gray-600 hover:bg-gray-50"}`}
+                    onClick={() => setActiveTab("profile")}
+                  >
                     <User className="h-4 w-4 mr-3" />
                     Profile
                   </Button>
-                  <Button variant="ghost" className="w-full justify-start text-gray-600 hover:bg-gray-50">
+                  <Button 
+                    variant="ghost" 
+                    className={`w-full justify-start ${activeTab === "api-keys" ? "bg-primary/10 text-primary hover:bg-primary/20" : "text-gray-600 hover:bg-gray-50"}`}
+                    onClick={() => setActiveTab("api-keys")}
+                  >
+                    <Key className="h-4 w-4 mr-3" />
+                    API Keys
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    className={`w-full justify-start ${activeTab === "notifications" ? "bg-primary/10 text-primary hover:bg-primary/20" : "text-gray-600 hover:bg-gray-50"}`}
+                    onClick={() => setActiveTab("notifications")}
+                  >
                     <Bell className="h-4 w-4 mr-3" />
                     Notifications
                   </Button>
-                  <Button variant="ghost" className="w-full justify-start text-gray-600 hover:bg-gray-50">
+                  <Button 
+                    variant="ghost" 
+                    className={`w-full justify-start ${activeTab === "security" ? "bg-primary/10 text-primary hover:bg-primary/20" : "text-gray-600 hover:bg-gray-50"}`}
+                    onClick={() => setActiveTab("security")}
+                  >
                     <Shield className="h-4 w-4 mr-3" />
                     Security
-                  </Button>
-                  <Button variant="ghost" className="w-full justify-start text-gray-600 hover:bg-gray-50">
-                    <CreditCard className="h-4 w-4 mr-3" />
-                    Billing
                   </Button>
                   <Button variant="ghost" className="w-full justify-start text-gray-600 hover:bg-gray-50">
                     <SettingsIcon className="h-4 w-4 mr-3" />
@@ -161,9 +179,10 @@ export default function Settings() {
 
           {/* Settings Content */}
           <div className="lg:col-span-2">
-            <Card>
-              <CardContent className="p-6">
-                <h2 className="text-xl font-semibold text-gray-900 mb-6">Profile Information</h2>
+            {activeTab === "profile" && (
+              <Card>
+                <CardContent className="p-6">
+                  <h2 className="text-xl font-semibold text-gray-900 mb-6">Profile Information</h2>
                 
                 {/* Profile Picture */}
                 <div className="mb-6">
@@ -274,6 +293,29 @@ export default function Settings() {
                 </form>
               </CardContent>
             </Card>
+            )}
+            
+            {activeTab === "api-keys" && (
+              <ApiKeyManagement />
+            )}
+            
+            {activeTab === "notifications" && (
+              <Card>
+                <CardContent className="p-6">
+                  <h2 className="text-xl font-semibold text-gray-900 mb-6">Notifications</h2>
+                  <p className="text-gray-600">Notification settings coming soon...</p>
+                </CardContent>
+              </Card>
+            )}
+            
+            {activeTab === "security" && (
+              <Card>
+                <CardContent className="p-6">
+                  <h2 className="text-xl font-semibold text-gray-900 mb-6">Security Settings</h2>
+                  <p className="text-gray-600">Security settings coming soon...</p>
+                </CardContent>
+              </Card>
+            )}
           </div>
         </div>
       </div>
