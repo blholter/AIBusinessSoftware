@@ -1,4 +1,4 @@
-import { users, type User, type InsertUser, type UpsertUser } from "@shared/schema";
+import { users, userApiKeys, type User, type InsertUser, type UpsertUser, type UserApiKey, type InsertApiKey } from "@shared/schema";
 import { db } from "./db";
 import { eq } from "drizzle-orm";
 
@@ -10,6 +10,13 @@ export interface IStorage {
   getUserByGoogleId(googleId: string): Promise<User | undefined>;
   createUser(insertUser: InsertUser): Promise<User>;
   upsertUser(upsertUser: UpsertUser): Promise<User>;
+  
+  // API Keys methods
+  getUserApiKeys(userId: number): Promise<UserApiKey[]>;
+  createApiKey(userId: number, apiKey: InsertApiKey): Promise<UserApiKey>;
+  updateApiKey(keyId: number, updates: Partial<InsertApiKey>): Promise<UserApiKey>;
+  deleteApiKey(keyId: number): Promise<void>;
+  getApiKey(keyId: number): Promise<UserApiKey | undefined>;
 }
 
 // Database storage implementation
@@ -65,6 +72,51 @@ export class DatabaseStorage implements IStorage {
       .values(upsertUser)
       .returning();
     return user;
+  }
+
+  // API Keys methods
+  async getUserApiKeys(userId: number): Promise<UserApiKey[]> {
+    return await db
+      .select()
+      .from(userApiKeys)
+      .where(eq(userApiKeys.userId, userId));
+  }
+
+  async createApiKey(userId: number, apiKey: InsertApiKey): Promise<UserApiKey> {
+    const [newKey] = await db
+      .insert(userApiKeys)
+      .values({
+        ...apiKey,
+        userId,
+      })
+      .returning();
+    return newKey;
+  }
+
+  async updateApiKey(keyId: number, updates: Partial<InsertApiKey>): Promise<UserApiKey> {
+    const [updatedKey] = await db
+      .update(userApiKeys)
+      .set({
+        ...updates,
+        updatedAt: new Date(),
+      })
+      .where(eq(userApiKeys.id, keyId))
+      .returning();
+    return updatedKey;
+  }
+
+  async deleteApiKey(keyId: number): Promise<void> {
+    await db
+      .delete(userApiKeys)
+      .where(eq(userApiKeys.id, keyId));
+  }
+
+  async getApiKey(keyId: number): Promise<UserApiKey | undefined> {
+    const [key] = await db
+      .select()
+      .from(userApiKeys)
+      .where(eq(userApiKeys.id, keyId));
+    return key || undefined;
   }
 }
 
