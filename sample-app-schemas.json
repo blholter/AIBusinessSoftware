@@ -1,0 +1,593 @@
+{
+  "sampleSchemas": [
+    {
+      "id": "email-automation",
+      "name": "Email Automation Tool",
+      "description": "Automate email sending with templates and scheduling",
+      "version": "1.0.0",
+      "category": "marketing",
+      "icon": "📧",
+      "color": "bg-gradient-to-br from-blue-100 to-indigo-100",
+      "inputs": [
+        {
+          "id": "sender_email",
+          "name": "sender_email",
+          "type": "email",
+          "label": "Sender Email",
+          "description": "Email address to send from",
+          "required": true,
+          "placeholder": "noreply@yourcompany.com",
+          "group": "sender",
+          "order": 1
+        },
+        {
+          "id": "sender_name",
+          "name": "sender_name",
+          "type": "text",
+          "label": "Sender Name",
+          "description": "Display name for the sender",
+          "required": true,
+          "placeholder": "Your Company",
+          "group": "sender",
+          "order": 2
+        },
+        {
+          "id": "recipient_list",
+          "name": "recipient_list",
+          "type": "textarea",
+          "label": "Recipient List",
+          "description": "Comma-separated list of email addresses",
+          "required": true,
+          "placeholder": "user1@example.com, user2@example.com",
+          "group": "recipients",
+          "order": 1,
+          "validation": {
+            "minLength": 5
+          }
+        },
+        {
+          "id": "subject_line",
+          "name": "subject_line",
+          "type": "text",
+          "label": "Subject Line",
+          "description": "Email subject line",
+          "required": true,
+          "placeholder": "Important Update",
+          "group": "content",
+          "order": 1,
+          "validation": {
+            "maxLength": 100
+          }
+        },
+        {
+          "id": "email_template",
+          "name": "email_template",
+          "type": "textarea",
+          "label": "Email Template",
+          "description": "HTML email template with placeholders like {{name}}",
+          "required": true,
+          "placeholder": "<h1>Hello {{name}},</h1><p>Welcome to our service...</p>",
+          "group": "content",
+          "order": 2,
+          "validation": {
+            "minLength": 20
+          }
+        },
+        {
+          "id": "schedule_type",
+          "name": "schedule_type",
+          "type": "select",
+          "label": "Schedule Type",
+          "description": "When to send the emails",
+          "required": true,
+          "defaultValue": "immediate",
+          "group": "scheduling",
+          "order": 1,
+          "options": [
+            { "value": "immediate", "label": "Send Immediately" },
+            { "value": "scheduled", "label": "Schedule for Later" },
+            { "value": "recurring", "label": "Recurring Schedule" }
+          ]
+        },
+        {
+          "id": "scheduled_time",
+          "name": "scheduled_time",
+          "type": "datetime",
+          "label": "Scheduled Time",
+          "description": "When to send the emails (if scheduled)",
+          "required": false,
+          "group": "scheduling",
+          "order": 2
+        },
+        {
+          "id": "track_opens",
+          "name": "track_opens",
+          "type": "boolean",
+          "label": "Track Email Opens",
+          "description": "Track when emails are opened",
+          "required": false,
+          "defaultValue": true,
+          "group": "tracking",
+          "order": 1
+        },
+        {
+          "id": "track_clicks",
+          "name": "track_clicks",
+          "type": "boolean",
+          "label": "Track Link Clicks",
+          "description": "Track when links are clicked",
+          "required": false,
+          "defaultValue": true,
+          "group": "tracking",
+          "order": 2
+        }
+      ],
+      "groups": [
+        {
+          "id": "sender",
+          "name": "Sender Configuration",
+          "description": "Configure who the emails will be sent from",
+          "order": 1
+        },
+        {
+          "id": "recipients",
+          "name": "Recipient List",
+          "description": "Define who will receive the emails",
+          "order": 2
+        },
+        {
+          "id": "content",
+          "name": "Email Content",
+          "description": "Set up the email subject and template",
+          "order": 3
+        },
+        {
+          "id": "scheduling",
+          "name": "Scheduling",
+          "description": "Configure when emails should be sent",
+          "order": 4
+        },
+        {
+          "id": "tracking",
+          "name": "Tracking Options",
+          "description": "Choose what to track",
+          "order": 5
+        }
+      ],
+      "metadata": {
+        "author": "Agentic AI Agent Apps.com",
+        "tags": ["email", "automation", "marketing"],
+        "estimatedRuntime": "1-3 minutes",
+        "complexity": "medium"
+      }
+    },
+    {
+      "id": "data-processor",
+      "name": "Data Processing Pipeline",
+      "description": "Process CSV data with transformations and analysis",
+      "version": "1.2.0",
+      "category": "operations",
+      "icon": "📊",
+      "color": "bg-gradient-to-br from-green-100 to-emerald-100",
+      "inputs": [
+        {
+          "id": "data_file",
+          "name": "data_file",
+          "type": "file",
+          "label": "Data File",
+          "description": "Upload your CSV file for processing",
+          "required": true,
+          "group": "input",
+          "order": 1
+        },
+        {
+          "id": "file_format",
+          "name": "file_format",
+          "type": "select",
+          "label": "File Format",
+          "description": "Format of the uploaded file",
+          "required": true,
+          "defaultValue": "csv",
+          "group": "input",
+          "order": 2,
+          "options": [
+            { "value": "csv", "label": "CSV" },
+            { "value": "json", "label": "JSON" },
+            { "value": "excel", "label": "Excel" },
+            { "value": "xml", "label": "XML" }
+          ]
+        },
+        {
+          "id": "processing_type",
+          "name": "processing_type",
+          "type": "multiselect",
+          "label": "Processing Operations",
+          "description": "Select which operations to perform",
+          "required": true,
+          "group": "processing",
+          "order": 1,
+          "options": [
+            { "value": "clean", "label": "Data Cleaning" },
+            { "value": "transform", "label": "Data Transformation" },
+            { "value": "aggregate", "label": "Aggregation" },
+            { "value": "filter", "label": "Filtering" },
+            { "value": "sort", "label": "Sorting" },
+            { "value": "analyze", "label": "Statistical Analysis" }
+          ]
+        },
+        {
+          "id": "output_format",
+          "name": "output_format",
+          "type": "select",
+          "label": "Output Format",
+          "description": "Format for the processed data",
+          "required": true,
+          "defaultValue": "csv",
+          "group": "output",
+          "order": 1,
+          "options": [
+            { "value": "csv", "label": "CSV" },
+            { "value": "json", "label": "JSON" },
+            { "value": "excel", "label": "Excel" },
+            { "value": "pdf", "label": "PDF Report" }
+          ]
+        },
+        {
+          "id": "include_summary",
+          "name": "include_summary",
+          "type": "boolean",
+          "label": "Include Summary Report",
+          "description": "Generate a summary of the processing results",
+          "required": false,
+          "defaultValue": true,
+          "group": "output",
+          "order": 2
+        },
+        {
+          "id": "custom_parameters",
+          "name": "custom_parameters",
+          "type": "json",
+          "label": "Custom Parameters",
+          "description": "Advanced processing parameters in JSON format",
+          "required": false,
+          "placeholder": "{\"batch_size\": 1000, \"timeout\": 300}",
+          "group": "advanced",
+          "order": 1
+        }
+      ],
+      "groups": [
+        {
+          "id": "input",
+          "name": "Input Configuration",
+          "description": "Configure the input data source",
+          "order": 1
+        },
+        {
+          "id": "processing",
+          "name": "Processing Options",
+          "description": "Select processing operations",
+          "order": 2
+        },
+        {
+          "id": "output",
+          "name": "Output Configuration",
+          "description": "Configure output format and options",
+          "order": 3
+        },
+        {
+          "id": "advanced",
+          "name": "Advanced Settings",
+          "description": "Advanced processing parameters",
+          "order": 4
+        }
+      ],
+      "metadata": {
+        "author": "Agentic AI Agent Apps.com",
+        "tags": ["data", "processing", "analysis", "csv"],
+        "estimatedRuntime": "5-15 minutes",
+        "complexity": "complex"
+      }
+    },
+    {
+      "id": "social-media-scheduler",
+      "name": "Social Media Scheduler",
+      "description": "Schedule and automate social media posts across multiple platforms",
+      "version": "1.1.0",
+      "category": "marketing",
+      "icon": "📱",
+      "color": "bg-gradient-to-br from-purple-100 to-pink-100",
+      "inputs": [
+        {
+          "id": "post_content",
+          "name": "post_content",
+          "type": "textarea",
+          "label": "Post Content",
+          "description": "The main content for your social media post",
+          "required": true,
+          "placeholder": "Share your message here...",
+          "group": "content",
+          "order": 1,
+          "validation": {
+            "minLength": 10,
+            "maxLength": 2000
+          }
+        },
+        {
+          "id": "image_url",
+          "name": "image_url",
+          "type": "url",
+          "label": "Image URL",
+          "description": "URL of an image to include with your post",
+          "required": false,
+          "placeholder": "https://example.com/image.jpg",
+          "group": "content",
+          "order": 2
+        },
+        {
+          "id": "platforms",
+          "name": "platforms",
+          "type": "multiselect",
+          "label": "Target Platforms",
+          "description": "Select which social media platforms to post to",
+          "required": true,
+          "group": "platforms",
+          "order": 1,
+          "options": [
+            { "value": "twitter", "label": "Twitter" },
+            { "value": "facebook", "label": "Facebook" },
+            { "value": "instagram", "label": "Instagram" },
+            { "value": "linkedin", "label": "LinkedIn" },
+            { "value": "tiktok", "label": "TikTok" },
+            { "value": "youtube", "label": "YouTube" }
+          ]
+        },
+        {
+          "id": "hashtags",
+          "name": "hashtags",
+          "type": "text",
+          "label": "Hashtags",
+          "description": "Comma-separated hashtags to include",
+          "required": false,
+          "placeholder": "#ai, #automation, #tech",
+          "group": "platforms",
+          "order": 2
+        },
+        {
+          "id": "schedule_type",
+          "name": "schedule_type",
+          "type": "select",
+          "label": "Schedule Type",
+          "description": "When to post the content",
+          "required": true,
+          "defaultValue": "immediate",
+          "group": "scheduling",
+          "order": 1,
+          "options": [
+            { "value": "immediate", "label": "Post Immediately" },
+            { "value": "scheduled", "label": "Schedule for Later" },
+            { "value": "recurring", "label": "Recurring Posts" }
+          ]
+        },
+        {
+          "id": "scheduled_time",
+          "name": "scheduled_time",
+          "type": "datetime",
+          "label": "Scheduled Time",
+          "description": "When to post (if scheduled)",
+          "required": false,
+          "group": "scheduling",
+          "order": 2
+        },
+        {
+          "id": "ai_optimize",
+          "name": "ai_optimize",
+          "type": "boolean",
+          "label": "AI Optimization",
+          "description": "Use AI to optimize post content for each platform",
+          "required": false,
+          "defaultValue": true,
+          "group": "ai",
+          "order": 1
+        },
+        {
+          "id": "ai_tone",
+          "name": "ai_tone",
+          "type": "select",
+          "label": "AI Tone",
+          "description": "Tone for AI-optimized content",
+          "required": false,
+          "defaultValue": "professional",
+          "group": "ai",
+          "order": 2,
+          "options": [
+            { "value": "professional", "label": "Professional" },
+            { "value": "casual", "label": "Casual" },
+            { "value": "friendly", "label": "Friendly" },
+            { "value": "humorous", "label": "Humorous" },
+            { "value": "formal", "label": "Formal" }
+          ]
+        }
+      ],
+      "groups": [
+        {
+          "id": "content",
+          "name": "Post Content",
+          "description": "Define your post content and media",
+          "order": 1
+        },
+        {
+          "id": "platforms",
+          "name": "Platform Selection",
+          "description": "Choose which platforms to post to",
+          "order": 2
+        },
+        {
+          "id": "scheduling",
+          "name": "Scheduling",
+          "description": "Configure when to post",
+          "order": 3
+        },
+        {
+          "id": "ai",
+          "name": "AI Optimization",
+          "description": "AI-powered content optimization",
+          "order": 4
+        }
+      ],
+      "metadata": {
+        "author": "Agentic AI Agent Apps.com",
+        "tags": ["social-media", "automation", "scheduling", "ai"],
+        "estimatedRuntime": "2-5 minutes",
+        "complexity": "medium"
+      }
+    },
+    {
+      "id": "ai-video-analysis",
+      "name": "AI Video Analysis",
+      "description": "Advanced video analysis workflow with AI-powered insights and processing capabilities",
+      "version": "1.0.0",
+      "author": "Agentic AI Agent Apps.com",
+      "category": "AI & Machine Learning",
+      "tags": ["video", "analysis", "ai", "workflow"],
+      "complexity": "complex",
+      "totalNodes": 22,
+      "nodeTypes": ["httpRequest", "formTrigger", "wait", "stickyNote", "set", "manualTrigger"],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "videoUrl": {
+            "type": "string",
+            "format": "url",
+            "title": "Video URL",
+            "description": "URL of the video to analyze",
+            "required": true
+          },
+          "analysisType": {
+            "type": "string",
+            "enum": ["content", "sentiment", "objects", "faces", "text", "audio"],
+            "title": "Analysis Type",
+            "description": "Type of analysis to perform on the video",
+            "default": "content"
+          },
+          "waitTime": {
+            "type": "number",
+            "title": "Processing Wait Time",
+            "description": "Time to wait between processing steps (seconds)",
+            "minimum": 1,
+            "maximum": 60,
+            "default": 5
+          },
+          "includeTranscript": {
+            "type": "boolean",
+            "title": "Include Transcript",
+            "description": "Generate transcript from video audio",
+            "default": true
+          },
+          "confidenceThreshold": {
+            "type": "number",
+            "title": "Confidence Threshold",
+            "description": "Minimum confidence level for analysis results",
+            "minimum": 0.1,
+            "maximum": 1.0,
+            "default": 0.7
+          }
+        },
+        "required": ["videoUrl"]
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "analysisId": {
+            "type": "string",
+            "description": "Unique identifier for the analysis"
+          },
+          "videoMetadata": {
+            "type": "object",
+            "properties": {
+              "duration": {
+                "type": "number",
+                "description": "Video duration in seconds"
+              },
+              "resolution": {
+                "type": "string",
+                "description": "Video resolution"
+              },
+              "format": {
+                "type": "string",
+                "description": "Video format"
+              }
+            }
+          },
+          "analysisResults": {
+            "type": "object",
+            "properties": {
+              "content": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "timestamp": {
+                      "type": "number",
+                      "description": "Timestamp in seconds"
+                    },
+                    "description": {
+                      "type": "string",
+                      "description": "Content description"
+                    },
+                    "confidence": {
+                      "type": "number",
+                      "description": "Confidence score"
+                    }
+                  }
+                }
+              },
+              "transcript": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "timestamp": {
+                      "type": "number"
+                    },
+                    "text": {
+                      "type": "string"
+                    }
+                  }
+                }
+              },
+              "objects": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "confidence": {
+                      "type": "number"
+                    },
+                    "boundingBox": {
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "processingTime": {
+            "type": "number",
+            "description": "Total processing time in seconds"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["completed", "failed", "processing"],
+            "description": "Analysis status"
+          }
+        }
+      },
+      "workflowCode": "import React, { useState, useEffect } from 'react';\nimport './App.css';\n\n// Generated from n8n workflow analysis with API key integration\n// Total nodes: 22\n// Complexity: complex\n// Node types: n8n-nodes-base.httpRequest, n8n-nodes-base.formTrigger, n8n-nodes-base.wait, n8n-nodes-base.stickyNote, n8n-nodes-base.set, n8n-nodes-base.manualTrigger\n\n// API Configuration (User's API Keys)\nconst API_CONFIG = {\n\n};\n\n// API Helper Functions\n\nfunction App() {\n  const [data, setData] = useState(null);\n  const [loading, setLoading] = useState(false);\n  const [error, setError] = useState(null);\n\n  // Workflow nodes:\n  // - Upload_File (n8n-nodes-base.httpRequest)\n  // - Get_Analysis (n8n-nodes-base.httpRequest)\n  // - On form submission 2 (n8n-nodes-base.formTrigger)\n  // - Get Analysis (n8n-nodes-base.httpRequest)\n  // - Upload File  (n8n-nodes-base.httpRequest)\n  // - 5 seconds (n8n-nodes-base.wait)\n  // - On form submission (n8n-nodes-base.formTrigger)\n  // - Sticky Note (n8n-nodes-base.stickyNote)\n  // - Sticky Note1 (n8n-nodes-base.stickyNote)\n  // - Sticky Note2 (n8n-nodes-base.stickyNote)\n  // - Wait (n8n-nodes-base.wait)\n  // - Sticky Note3 (n8n-nodes-base.stickyNote)\n  // - Sticky Note4 (n8n-nodes-base.stickyNote)\n  // - Video Analysis (n8n-nodes-base.set)\n  // - Sticky Note5 (n8n-nodes-base.stickyNote)\n  // - Sticky Note6 (n8n-nodes-base.stickyNote)\n  // - Edit Fields (n8n-nodes-base.set)\n  // - When clicking 'Test workflow' (n8n-nodes-base.manualTrigger)\n  // - YouTube Video (n8n-nodes-base.httpRequest)\n  // - Get Results (n8n-nodes-base.set)\n  // - Sticky Note7 (n8n-nodes-base.stickyNote)\n  // - Sticky Note8 (n8n-nodes-base.stickyNote)\n\n  const processWorkflow = async (inputData) => {\n    setLoading(true);\n    setError(null);\n    \n    try {\n      // Simulate workflow processing with API integrations\n      let result = inputData;\n      \n      // Process through workflow nodes\n      // Process Upload_File (n8n-nodes-base.httpRequest)\n      result = await processHttpRequestNode(result);\n      // Process Get_Analysis (n8n-nodes-base.httpRequest)\n      result = await processHttpRequestNode(result);\n      // Process On form submission 2 (n8n-nodes-base.formTrigger)\n      result = await processFormTriggerNode(result);\n      // Process Get Analysis (n8n-nodes-base.httpRequest)\n      result = await processHttpRequestNode(result);\n      // Process Upload File  (n8n-nodes-base.httpRequest)\n      result = await processHttpRequestNode(result);\n      // Process 5 seconds (n8n-nodes-base.wait)\n      result = await processWaitNode(result);\n      // Process On form submission (n8n-nodes-base.formTrigger)\n      result = await processFormTriggerNode(result);\n      // Process Sticky Note (n8n-nodes-base.stickyNote)\n      result = await processStickyNoteNode(result);\n      // Process Sticky Note1 (n8n-nodes-base.stickyNote)\n      result = await processStickyNoteNode(result);\n      // Process Sticky Note2 (n8n-nodes-base.stickyNote)\n      result = await processStickyNoteNode(result);\n      // Process Wait (n8n-nodes-base.wait)\n      result = await processWaitNode(result);\n      // Process Sticky Note3 (n8n-nodes-base.stickyNote)\n      result = await processStickyNoteNode(result);\n      // Process Sticky Note4 (n8n-nodes-base.stickyNote)\n      result = await processStickyNoteNode(result);\n      // Process Video Analysis (n8n-nodes-base.set)\n      result = await processSetNode(result);\n      // Process Sticky Note5 (n8n-nodes-base.stickyNote)\n      result = await processStickyNoteNode(result);\n      // Process Sticky Note6 (n8n-nodes-base.stickyNote)\n      result = await processStickyNoteNode(result);\n      // Process Edit Fields (n8n-nodes-base.set)\n      result = await processSetNode(result);\n      // Process When clicking 'Test workflow' (n8n-nodes-base.manualTrigger)\n      result = await processManualTriggerNode(result);\n      // Process YouTube Video (n8n-nodes-base.httpRequest)\n      result = await processHttpRequestNode(result);\n      // Process Get Results (n8n-nodes-base.set)\n      result = await processSetNode(result);\n      // Process Sticky Note7 (n8n-nodes-base.stickyNote)\n      result = await processStickyNoteNode(result);\n      // Process Sticky Note8 (n8n-nodes-base.stickyNote)\n      result = await processStickyNoteNode(result);\n      \n      setData(result);\n    } catch (err) {\n      setError(err.message);\n    } finally {\n      setLoading(false);\n    }\n  };\n\n  // Enhanced node processing functions with API integration\n  const processHttpRequestNode = async (input) => {\n    // TODO: Implement httpRequest node logic\n    console.log('Processing HTTP Request with input:', input);\n    return input;\n  };\n\n  const processFormTriggerNode = async (input) => {\n    // TODO: Implement formTrigger node logic\n    console.log('Processing Form Trigger with input:', input);\n    return input;\n  };\n\n  const processWaitNode = async (input) => {\n    // TODO: Implement wait node logic\n    console.log('Processing Wait with input:', input);\n    return input;\n  };\n\n  const processStickyNoteNode = async (input) => {\n    // TODO: Implement stickyNote node logic\n    console.log('Processing Sticky Note with input:', input);\n    return input;\n  };\n\n  const processSetNode = async (input) => {\n    // TODO: Implement set node logic\n    console.log('Processing Set with input:', input);\n    return input;\n  };\n\n  const processManualTriggerNode = async (input) => {\n    // TODO: Implement manualTrigger node logic\n    console.log('Processing Manual Trigger with input:', input);\n    return input;\n  };\n\n  return (\n    <div className=\"App\">\n      <header className=\"App-header\">\n        <h1>AI Video Analysis</h1>\n        <p>Advanced video analysis workflow with AI-powered insights</p>\n      </header>\n      \n      <main>\n        <div className=\"workflow-info\">\n          <h2>Workflow Information</h2>\n          <p><strong>Complexity:</strong> complex</p>\n          <p><strong>Total Nodes:</strong> 22</p>\n          <p><strong>Node Types:</strong> httpRequest, formTrigger, wait, stickyNote, set, manualTrigger</p>\n          \n          <p><strong>Features:</strong> Video analysis, AI processing, API integration</p>\n        </div>\n        \n        <div className=\"workflow-controls\">\n          <button \n            onClick={() => processWorkflow({ \n              videoUrl: 'https://example.com/video.mp4',\n              analysisType: 'content',\n              waitTime: 5,\n              includeTranscript: true,\n              confidenceThreshold: 0.7\n            })}\n            disabled={loading}\n          >\n            {loading ? 'Processing...' : 'Run Video Analysis'}\n          </button>\n        </div>\n        \n        {error && (\n          <div className=\"error\">\n            <h3>Error:</h3>\n            <p>{error}</p>\n          </div>\n        )}\n        \n        {data && (\n          <div className=\"result\">\n            <h3>Result:</h3>\n            <pre>{JSON.stringify(data, null, 2)}</pre>\n          </div>\n        )}\n      </main>\n    </div>\n  );\n}\n\nexport default App;",
+      "createdAt": "2024-01-15T20:00:00Z",
+      "updatedAt": "2024-01-15T20:00:00Z"
+    }
+  ]
+} 

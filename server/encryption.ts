@@ -3,7 +3,7 @@ import crypto from "crypto";
 const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY || crypto.randomBytes(32).toString('hex');
 
 export function encryptApiKey(apiKey: string): string {
-  const algorithm = 'aes-256-gcm';
+  const algorithm = 'aes-256-cbc';
   const key = crypto.scryptSync(ENCRYPTION_KEY, 'salt', 32);
   const iv = crypto.randomBytes(16);
   
@@ -13,27 +13,24 @@ export function encryptApiKey(apiKey: string): string {
   let encrypted = cipher.update(apiKey, 'utf8', 'hex');
   encrypted += cipher.final('hex');
   
-  const authTag = cipher.getAuthTag();
-  return iv.toString('hex') + ':' + authTag.toString('hex') + ':' + encrypted;
+  return iv.toString('hex') + ':' + encrypted;
 }
 
 export function decryptApiKey(encryptedKey: string): string {
   try {
-    const algorithm = 'aes-256-gcm';
+    const algorithm = 'aes-256-cbc';
     const key = crypto.scryptSync(ENCRYPTION_KEY, 'salt', 32);
     
     const parts = encryptedKey.split(':');
-    if (parts.length !== 3) {
+    if (parts.length !== 2) {
       throw new Error('Invalid encrypted key format');
     }
     
     const iv = Buffer.from(parts[0], 'hex');
-    const authTag = Buffer.from(parts[1], 'hex');
-    const encrypted = parts[2];
+    const encrypted = parts[1];
     
     const decipher = crypto.createDecipher(algorithm, key);
     decipher.setIV(iv);
-    decipher.setAuthTag(authTag);
     
     let decrypted = decipher.update(encrypted, 'hex', 'utf8');
     decrypted += decipher.final('utf8');

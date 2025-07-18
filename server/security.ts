@@ -142,3 +142,34 @@ export const enhancedAuth = (req: any, res: Response, next: NextFunction) => {
   
   next();
 };
+
+// Admin authorization middleware
+export const requireAdmin = (req: any, res: Response, next: NextFunction) => {
+  if (!req.isAuthenticated()) {
+    auditLog('ADMIN_ACCESS_ATTEMPT_UNAUTHENTICATED', null, {
+      ip: req.ip,
+      path: req.path,
+      userAgent: req.get('User-Agent'),
+    });
+    return res.status(401).json({ error: "Not authenticated" });
+  }
+  
+  // Check if user has admin role
+  if (req.user.role !== 'admin') {
+    auditLog('ADMIN_ACCESS_ATTEMPT_UNAUTHORIZED', req.user.id, {
+      ip: req.ip,
+      path: req.path,
+      userAgent: req.get('User-Agent'),
+      userRole: req.user.role,
+    });
+    return res.status(403).json({ error: "Admin access required" });
+  }
+  
+  auditLog('ADMIN_ACCESS_GRANTED', req.user.id, {
+    ip: req.ip,
+    path: req.path,
+    userAgent: req.get('User-Agent'),
+  });
+  
+  next();
+};

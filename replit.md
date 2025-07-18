@@ -1,4 +1,4 @@
-# AI Marketplace - System Architecture
+# Agentic AI Agent Apps.com - System Architecture
 
 ## Overview
 

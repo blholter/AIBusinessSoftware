@@ -12,6 +12,7 @@ type AuthContextType = {
   user: User | null;
   isLoading: boolean;
   error: Error | null;
+  isAdmin: boolean;
   loginMutation: UseMutationResult<User, Error, LoginData>;
   logoutMutation: UseMutationResult<void, Error, void>;
   registerMutation: UseMutationResult<User, Error, RegisterData>;
@@ -22,6 +23,25 @@ export const AuthContext = createContext<AuthContextType | null>(null);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const { toast } = useToast();
   
+  // TEMPORARY: Bypass authentication for development
+  const mockUser: User = {
+    id: 1,
+    email: "dev@example.com",
+    username: "developer",
+    password: null,
+    firstName: "Dev",
+    lastName: "User",
+    profileImageUrl: null,
+    bio: null,
+    location: null,
+    website: null,
+    googleId: null,
+    authProvider: "email",
+    role: "admin", // Set as admin for development
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  };
+
   const {
     data: user,
     error,
@@ -29,6 +49,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   } = useQuery<User | undefined, Error>({
     queryKey: ["/api/user"],
     queryFn: getQueryFn({ on401: "returnNull" }),
+    // Remove initialData: mockUser for correct logout behavior
   });
 
   const loginMutation = useMutation({
@@ -38,6 +59,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     },
     onSuccess: (user: User) => {
       queryClient.setQueryData(["/api/user"], user);
+      queryClient.invalidateQueries({ queryKey: ["/api/user"] });
+      // Force a complete cache clear
+      queryClient.clear();
       toast({
         title: "Welcome back!",
         description: "You have successfully logged in.",
@@ -99,6 +123,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         user: user ?? null,
         isLoading,
         error,
+        isAdmin: user?.role === 'admin' || false,
         loginMutation,
         logoutMutation,
         registerMutation,

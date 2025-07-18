@@ -29,7 +29,9 @@ export const getQueryFn: <T>(options: {
 }) => QueryFunction<T> =
   ({ on401: unauthorizedBehavior }) =>
   async ({ queryKey }) => {
-    const res = await fetch(queryKey.join("/") as string, {
+    const timestamp = Date.now();
+    const url = `${queryKey.join("/")}?_t=${timestamp}`;
+    const res = await fetch(url, {
       credentials: "include",
     });
 
@@ -47,7 +49,7 @@ export const queryClient = new QueryClient({
       queryFn: getQueryFn({ on401: "throw" }),
       refetchInterval: false,
       refetchOnWindowFocus: false,
-      staleTime: Infinity,
+      staleTime: 0, // Allow refetching when data becomes stale
       retry: false,
     },
     mutations: {

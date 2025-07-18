@@ -111,7 +111,14 @@ export default function Settings() {
                 <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center mr-3">
                   <Bot className="h-5 w-5 text-primary-foreground" />
                 </div>
-                <span className="text-xl font-bold text-gray-900">AI Marketplace</span>
+                <div className="flex flex-col items-center">
+                  <span className="text-2xl font-extrabold text-gray-500 leading-none tracking-tight" style={{ letterSpacing: "0.05em" }}>
+                    Agentic
+                  </span>
+                  <span className="text-xs font-semibold text-gray-700 tracking-wide" style={{ marginTop: "-2px" }}>
+                    AI Agent Apps .com
+                  </span>
+                </div>
               </div>
             </div>
 

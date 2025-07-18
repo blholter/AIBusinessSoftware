@@ -12,7 +12,21 @@ import { authLimiter, sessionSecurity, auditLog } from "./security";
 
 declare global {
   namespace Express {
-    interface User extends User {}
+    interface User {
+      id: number;
+      email: string;
+      username?: string | null;
+      firstName?: string | null;
+      lastName?: string | null;
+      profileImageUrl?: string | null;
+      bio?: string | null;
+      location?: string | null;
+      website?: string | null;
+      googleId?: string | null;
+      authProvider?: string | null;
+      createdAt: Date | null;
+      updatedAt: Date | null;
+    }
   }
 }
 
@@ -36,7 +50,9 @@ export function setupAuth(app: Express) {
   const PostgresSessionStore = connectPg(session);
   const sessionStore = new PostgresSessionStore({
     conString: process.env.DATABASE_URL,
-    createTableIfMissing: true,
+    tableName: 'sessions',
+    // Disable automatic table creation to avoid index conflicts
+    createTableIfMissing: false,
   });
 
   const sessionSettings: session.SessionOptions = {

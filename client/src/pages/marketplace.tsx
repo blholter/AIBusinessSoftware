@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { useQuery } from "@tanstack/react-query";
+import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -24,103 +25,33 @@ import {
   TrendingUp,
   Building,
   DollarSign,
-  Settings as SettingsIcon
+  Settings as SettingsIcon,
+  Play
 } from "lucide-react";
 
-// Mock data for demonstration
-const mockApps = [
-  {
-    id: 1,
-    name: "Social Media Manager",
-    description: "Automate your social media posts and engagement",
-    category: "marketing",
-    icon: "📱",
-    color: "bg-gradient-to-br from-orange-100 to-pink-100",
-    downloads: "1.2M",
-    rating: 4.8,
-    featured: true
-  },
-  {
-    id: 2,
-    name: "Lead Generator",
-    description: "AI-powered lead generation and qualification",
-    category: "sales",
-    icon: "🎯",
-    color: "bg-gradient-to-br from-blue-100 to-purple-100",
-    downloads: "850K",
-    rating: 4.9,
-    featured: true
-  },
-  {
-    id: 3,
-    name: "Project Tracker",
-    description: "Smart project management and team coordination",
-    category: "operations",
-    icon: "📋",
-    color: "bg-gradient-to-br from-green-100 to-emerald-100",
-    downloads: "650K",
-    rating: 4.7,
-    featured: true
-  },
-  {
-    id: 4,
-    name: "Expense Analyzer",
-    description: "Automated expense categorization and reporting",
-    category: "finance",
-    icon: "💰",
-    color: "bg-gradient-to-br from-indigo-100 to-cyan-100",
-    downloads: "420K",
-    rating: 4.6,
-    featured: false
-  },
-  {
-    id: 5,
-    name: "Recruitment Assistant",
-    description: "AI-powered candidate screening and matching",
-    category: "hr",
-    icon: "👥",
-    color: "bg-gradient-to-br from-purple-100 to-pink-100",
-    downloads: "380K",
-    rating: 4.5,
-    featured: false
-  },
-  {
-    id: 6,
-    name: "Network Monitor",
-    description: "Real-time network monitoring and alerts",
-    category: "it",
-    icon: "🔧",
-    color: "bg-gradient-to-br from-gray-100 to-slate-100",
-    downloads: "290K",
-    rating: 4.4,
-    featured: false
-  },
-  {
-    id: 7,
-    name: "Document Scanner",
-    description: "OCR and document digitization tool",
-    category: "other",
-    icon: "📄",
-    color: "bg-gradient-to-br from-yellow-100 to-orange-100",
-    downloads: "180K",
-    rating: 4.3,
-    featured: false
-  }
-];
+// Empty mock apps - ready for real apps from database
+const mockApps: any[] = [];
 
 export default function Marketplace() {
-  const { user, logoutMutation } = useAuth();
+  const { user, isAdmin, logoutMutation } = useAuth();
+  const [, setLocation] = useLocation();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [sortBy, setSortBy] = useState("popular");
 
-  const { data: applications = mockApps, error } = useQuery({
+  const { data: applications, error, isLoading: appsLoading } = useQuery({
     queryKey: ["/api/applications"],
     enabled: !!user,
   });
 
-  // Always use mockApps for now since the API returns empty array
-  const apps = applications && applications.length > 0 ? applications : mockApps;
+  // Combine mock apps with database apps, giving priority to database apps
+  const dbApps = applications && Array.isArray(applications) ? applications : [];
+  const combinedApps = [...mockApps, ...dbApps];
+  
+  // Remove duplicates based on ID (database apps take priority)
+  const apps = combinedApps.filter((app, index, self) => 
+    index === self.findIndex(a => a.id === app.id)
+  );
 
   const handleLogout = () => {
     logoutMutation.mutate();
@@ -147,6 +78,18 @@ export default function Marketplace() {
   const featuredApps = filteredApps.filter((app: any) => app.featured);
   const allApps = filteredApps;
 
+  // Show loading state while checking authentication
+  if (user === undefined) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -154,11 +97,13 @@ export default function Marketplace() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
-              <div className="flex items-center space-x-3">
-                <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-                  <Sparkles className="h-5 w-5 text-white" />
-                </div>
-                <span className="text-xl font-bold text-gray-900">AI Marketplace</span>
+              <div className="flex flex-col items-center">
+                <span className="text-2xl font-extrabold text-gray-500 leading-none tracking-tight" style={{ letterSpacing: "0.05em" }}>
+                  Agentic
+                </span>
+                <span className="text-xs font-semibold text-gray-700 tracking-wide" style={{ marginTop: "-2px" }}>
+                  AI Agent Apps .com
+                </span>
               </div>
             </div>
 
@@ -175,23 +120,109 @@ export default function Marketplace() {
             </div>
 
             <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-600">
-                Welcome, {user?.firstName || user?.email}
-              </span>
-              <Button variant="ghost" size="sm" onClick={() => window.location.href = "/settings"}>
-                <Settings className="h-4 w-4" />
-              </Button>
-              <Button variant="outline" size="sm" onClick={handleLogout}>
-                <LogOut className="h-4 w-4" />
-              </Button>
+              {user ? (
+                <>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={() => setLocation("/blog")}
+                    className="text-purple-600 hover:text-purple-700"
+                  >
+                    Blog
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={() => setLocation("/my-workflows")}
+                    className="text-blue-600 hover:text-blue-700"
+                  >
+                    My Workflows
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={() => setLocation("/submit-app")}
+                    className="text-green-600 hover:text-green-700"
+                  >
+                    Submit App
+                  </Button>
+                                {isAdmin && (
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={() => setLocation("/admin")}
+                  className="text-red-600 hover:text-red-700"
+                >
+                  Admin Panel
+                </Button>
+              )}
+                  <span className="text-sm text-gray-600">
+                    Welcome, {user?.firstName || user?.email}
+                  </span>
+                  <Button variant="ghost" size="sm" onClick={() => window.location.href = "/settings"}>
+                    <Settings className="h-4 w-4" />
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={handleLogout}>
+                    <LogOut className="h-4 w-4" />
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={() => setLocation("/blog")}
+                    className="text-purple-600 hover:text-purple-700"
+                  >
+                    Blog
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={() => setLocation("/auth")}
+                    className="text-blue-600 hover:text-blue-700"
+                  >
+                    Login
+                  </Button>
+                  <Button 
+                    variant="default" 
+                    size="sm" 
+                    onClick={() => setLocation("/auth")}
+                  >
+                    Create Account
+                  </Button>
+                </>
+              )}
             </div>
           </div>
         </div>
       </header>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Category Tabs */}
-        <Tabs value={selectedCategory} onValueChange={setSelectedCategory} className="mb-8">
+        {!user ? (
+          <div className="text-center py-12">
+            <div className="max-w-md mx-auto">
+              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Sparkles className="h-8 w-8 text-blue-600" />
+              </div>
+              <h2 className="text-2xl font-bold text-gray-900 mb-4">Welcome to AI Marketplace</h2>
+              <p className="text-gray-600 mb-6">
+                Sign in to discover and run amazing AI applications built by our community.
+              </p>
+              <div className="flex gap-4 justify-center">
+                <Button onClick={() => setLocation("/auth")}>
+                  Sign In
+                </Button>
+                <Button variant="outline" onClick={() => setLocation("/auth")}>
+                  Create Account
+                </Button>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <>
+            {/* Category Tabs */}
+            <Tabs value={selectedCategory} onValueChange={setSelectedCategory} className="mb-8">
           <TabsList className="grid w-full grid-cols-8 bg-white border">
             {categories.map((category) => (
               <TabsTrigger 
@@ -217,7 +248,11 @@ export default function Marketplace() {
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                   {featuredApps.map((app: any) => (
-                    <Card key={app.id} className="group hover:shadow-lg transition-all duration-200 border-0 shadow-sm overflow-hidden">
+                    <Card 
+                      key={app.id} 
+                      className="group hover:shadow-lg transition-all duration-200 border-0 shadow-sm overflow-hidden cursor-pointer"
+                      onClick={() => setLocation(`/app-runner/${app.id}`)}
+                    >
                       <CardContent className="p-0">
                         <div className={`${app.color} h-32 p-6 flex items-center justify-center relative`}>
                           <div className="text-4xl">{app.icon}</div>
@@ -240,9 +275,15 @@ export default function Marketplace() {
                               <Download className="h-3 w-3 text-gray-400" />
                               <span className="text-xs text-gray-500">{app.downloads}</span>
                             </div>
-                            <Badge variant="outline" className="text-xs">
-                              {app.category}
-                            </Badge>
+                            <div className="flex items-center gap-2">
+                              <Badge variant="outline" className="text-xs">
+                                {app.category}
+                              </Badge>
+                              <div className="flex items-center text-xs text-blue-600 group-hover:text-blue-700">
+                                <Play className="h-3 w-3 mr-1" />
+                                Run App
+                              </div>
+                            </div>
                           </div>
                         </div>
                       </CardContent>
@@ -268,7 +309,11 @@ export default function Marketplace() {
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {allApps.map((app: any) => (
-                  <Card key={app.id} className="group hover:shadow-lg transition-all duration-200 border-0 shadow-sm overflow-hidden">
+                  <Card 
+                    key={app.id} 
+                    className="group hover:shadow-lg transition-all duration-200 border-0 shadow-sm overflow-hidden cursor-pointer"
+                    onClick={() => setLocation(`/app-runner/${app.id}`)}
+                  >
                     <CardContent className="p-0">
                       <div className={`${app.color} h-32 p-6 flex items-center justify-center relative`}>
                         <div className="text-4xl">{app.icon}</div>
@@ -291,9 +336,15 @@ export default function Marketplace() {
                             <Download className="h-3 w-3 text-gray-400" />
                             <span className="text-xs text-gray-500">{app.downloads}</span>
                           </div>
-                          <Badge variant="outline" className="text-xs">
-                            {app.category}
-                          </Badge>
+                          <div className="flex items-center gap-2">
+                            <Badge variant="outline" className="text-xs">
+                              {app.category}
+                            </Badge>
+                            <div className="flex items-center text-xs text-blue-600 group-hover:text-blue-700">
+                              <Play className="h-3 w-3 mr-1" />
+                              Run App
+                            </div>
+                          </div>
                         </div>
                       </div>
                     </CardContent>
@@ -308,7 +359,11 @@ export default function Marketplace() {
             <TabsContent key={category.id} value={category.id}>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {allApps.filter((app: any) => app.category === category.id).map((app: any) => (
-                  <Card key={app.id} className="group hover:shadow-lg transition-all duration-200 border-0 shadow-sm overflow-hidden">
+                  <Card 
+                    key={app.id} 
+                    className="group hover:shadow-lg transition-all duration-200 border-0 shadow-sm overflow-hidden cursor-pointer"
+                    onClick={() => setLocation(`/app-runner/${app.id}`)}
+                  >
                     <CardContent className="p-0">
                       <div className={`${app.color} h-32 p-6 flex items-center justify-center relative`}>
                         <div className="text-4xl">{app.icon}</div>
@@ -331,9 +386,15 @@ export default function Marketplace() {
                             <Download className="h-3 w-3 text-gray-400" />
                             <span className="text-xs text-gray-500">{app.downloads}</span>
                           </div>
-                          <Badge variant="outline" className="text-xs">
-                            {app.category}
-                          </Badge>
+                          <div className="flex items-center gap-2">
+                            <Badge variant="outline" className="text-xs">
+                              {app.category}
+                            </Badge>
+                            <div className="flex items-center text-xs text-blue-600 group-hover:text-blue-700">
+                              <Play className="h-3 w-3 mr-1" />
+                              Run App
+                            </div>
+                          </div>
                         </div>
                       </div>
                     </CardContent>
@@ -343,6 +404,8 @@ export default function Marketplace() {
             </TabsContent>
           ))}
         </Tabs>
+          </>
+        )}
       </div>
     </div>
   );

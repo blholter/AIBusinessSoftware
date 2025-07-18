@@ -1,4 +1,4 @@
-# AI Marketplace - Secure BYOK Platform
+# Agentic AI Agent Apps.com - Secure BYOK Platform
 
 A sophisticated AI marketplace platform enabling users to discover, deploy, and interact with AI-powered web applications across various business domains using a secure Bring Your Own Key (BYOK) model.
 
@@ -56,7 +56,7 @@ A sophisticated AI marketplace platform enabling users to discover, deploy, and 
 1. Clone the repository:
 ```bash
 git clone [your-repo-url]
-cd ai-marketplace
+cd agentic-ai-agent-apps
 ```
 
 2. Install dependencies:

@@ -1,0 +1,27 @@
+{
+  "workflowName": "Test AI Workflow",
+  "workflowData": {
+    "nodes": [
+      {
+        "id": "1",
+        "name": "OpenAI Chat",
+        "type": "n8n-nodes-base.openAi",
+        "position": [100, 100]
+      },
+      {
+        "id": "2",
+        "name": "HTTP Request",
+        "type": "n8n-nodes-base.httpRequest",
+        "position": [300, 100]
+      },
+      {
+        "id": "3",
+        "name": "JavaScript Function",
+        "type": "n8n-nodes-base.function",
+        "position": [500, 100]
+      }
+    ],
+    "connections": {}
+  },
+  "outputFormat": "react"
+} 
