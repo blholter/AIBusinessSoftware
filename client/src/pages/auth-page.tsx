@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useAuth } from "@/hooks/use-auth";
+import { useSupabaseAuth } from "@/hooks/use-supabase-auth";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,7 +13,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Chrome, Mail, Lock, User } from "lucide-react";
 
 export default function AuthPage() {
-  const { user, loginMutation, registerMutation } = useAuth();
+  const { user, signIn, signUp, signInWithGoogle, isSigningIn, isSigningUp } = useSupabaseAuth();
   const [location, setLocation] = useLocation();
 
   const loginForm = useForm({
@@ -41,16 +41,20 @@ export default function AuthPage() {
     return null;
   }
 
-  const onLogin = (data: any) => {
-    loginMutation.mutate(data);
+  const onLogin = async (data: any) => {
+    await signIn(data.email, data.password);
   };
 
-  const onRegister = (data: any) => {
-    registerMutation.mutate(data);
+  const onRegister = async (data: any) => {
+    await signUp(data.email, data.password, {
+      username: data.username,
+      first_name: data.firstName,
+      last_name: data.lastName,
+    });
   };
 
-  const handleGoogleLogin = () => {
-    window.location.href = "/api/auth/google";
+  const handleGoogleLogin = async () => {
+    await signInWithGoogle();
   };
 
   return (
@@ -143,9 +147,9 @@ export default function AuthPage() {
                     <Button
                       type="submit"
                       className="w-full"
-                      disabled={loginMutation.isPending}
+                      disabled={isSigningIn}
                     >
-                      {loginMutation.isPending ? "Signing in..." : "Sign in"}
+                      {isSigningIn ? "Signing in..." : "Sign in"}
                     </Button>
                   </form>
                 </Form>
@@ -247,9 +251,9 @@ export default function AuthPage() {
                     <Button
                       type="submit"
                       className="w-full"
-                      disabled={registerMutation.isPending}
+                      disabled={isSigningUp}
                     >
-                      {registerMutation.isPending ? "Creating account..." : "Create account"}
+                      {isSigningUp ? "Creating account..." : "Create account"}
                     </Button>
                   </form>
                 </Form>

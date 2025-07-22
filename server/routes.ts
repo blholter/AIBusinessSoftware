@@ -32,6 +32,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Setup authentication
   setupAuth(app);
 
+  // Health check endpoint for Railway
+  app.get('/', (req, res) => {
+    res.json({ 
+      status: 'ok', 
+      message: 'Server is running',
+      timestamp: new Date().toISOString(),
+      port: process.env.PORT || '5000'
+    });
+  });
+
   // User profile update
   app.put('/api/user/profile', strictLimiter, enhancedAuth, async (req: any, res) => {
     try {
