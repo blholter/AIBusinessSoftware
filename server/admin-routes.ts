@@ -8,9 +8,18 @@ import multer from "multer";
 const isAdmin = (req: any, res: any, next: any) => {
   // For now, we'll use a simple admin check
   // In production, you'd want to add an admin role to the user table
-  const adminEmails = process.env.ADMIN_EMAILS?.split(',') || ['admin@example.com'];
+  const adminEmails = process.env.ADMIN_EMAILS?.split(',').map(email => email.trim()) || [];
   
-  if (!req.user || !adminEmails.includes(req.user.email)) {
+  if (!req.user) {
+    return res.status(401).json({ error: "Authentication required" });
+  }
+  
+  if (adminEmails.length === 0) {
+    console.error('No admin emails configured. Please set ADMIN_EMAILS environment variable.');
+    return res.status(403).json({ error: "Admin access not configured" });
+  }
+  
+  if (!adminEmails.includes(req.user.email)) {
     return res.status(403).json({ error: "Admin access required" });
   }
   next();
