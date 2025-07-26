@@ -46,38 +46,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     });
   });
 
-  // Admin check endpoint for Supabase auth
-  app.post('/api/admin/check', async (req, res) => {
-    try {
-      const { email } = req.body;
-      
-      if (!email) {
-        return res.status(400).json({ error: "Email is required" });
-      }
-      
-      const adminEmails = process.env.ADMIN_EMAILS?.split(',').map(email => email.trim()) || [];
-      
-      if (adminEmails.length === 0) {
-        console.error('No admin emails configured. Please set ADMIN_EMAILS environment variable.');
-        return res.status(403).json({ error: "Admin access not configured" });
-      }
-      
-      const isAdmin = adminEmails.includes(email);
-      
-      console.log(`Admin check for ${email}: ${isAdmin ? 'GRANTED' : 'DENIED'}`);
-      console.log(`Allowed admin emails: ${adminEmails.join(', ')}`);
-      
-      res.json({ 
-        isAdmin,
-        email,
-        message: isAdmin ? "Admin access granted" : "Admin access denied"
-      });
-    } catch (error) {
-      console.error("Error checking admin status:", error);
-      res.status(500).json({ error: "Failed to check admin status" });
-    }
-  });
-
   // User profile update
   app.put('/api/user/profile', strictLimiter, enhancedAuth, async (req: any, res) => {
     try {
