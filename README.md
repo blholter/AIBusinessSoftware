@@ -125,6 +125,12 @@ The application will be available at `http://localhost:5000`
 - **Security Recommendations**: Best practices guidance
 - **Account Status**: Monitor authentication and encryption status
 
+### Admin Dashboard
+- **Applications Management**: Create, edit, and delete applications
+- **Blog Posts Management**: Create and manage blog content for SEO
+- **JSON to App Converter**: Bulk import applications from JSON files
+- **Admin Access**: Secure admin-only routes with email-based authorization
+
 ## 🔧 API Endpoints
 
 ### Authentication
@@ -143,6 +149,22 @@ The application will be available at `http://localhost:5000`
 ### Applications
 - `GET /api/applications` - List all applications
 - `POST /api/applications` - Create new application (admin)
+
+### Blog Posts
+- `GET /api/blog-posts` - Get published blog posts
+- `GET /api/blog-posts/:slug` - Get blog post by slug
+
+### Admin Endpoints (requires admin access)
+- `GET /api/admin/applications` - Get all applications (admin view)
+- `POST /api/admin/applications` - Create new application
+- `PUT /api/admin/applications/:id` - Update application
+- `DELETE /api/admin/applications/:id` - Delete application
+- `GET /api/admin/blog-posts` - Get all blog posts (admin view)
+- `POST /api/admin/blog-posts` - Create new blog post
+- `PUT /api/admin/blog-posts/:id` - Update blog post
+- `DELETE /api/admin/blog-posts/:id` - Delete blog post
+- `POST /api/admin/convert-json` - Convert JSON file to applications
+- `POST /api/admin/convert-json-string` - Convert JSON string to applications
 
 ## 🚀 Deployment
 

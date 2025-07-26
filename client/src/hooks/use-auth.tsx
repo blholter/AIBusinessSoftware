@@ -7,40 +7,9 @@ import {
 import { User, LoginData, RegisterData } from "@shared/schema";
 import { getQueryFn, apiRequest, queryClient } from "../lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { Pool } from 'pg';
-import { drizzle } from 'drizzle-orm/node-postgres';
-import * as schema from "@shared/schema";
 
-if (!process.env.DATABASE_URL) {
-  console.log("DATABASE_URL not set, using mock database for development");
-}
-
-// Create mock database for development
-const mockPool = {
-  query: async (sql: string, params?: any[]) => {
-    console.log("Mock query:", sql, params);
-    return { rows: [] };
-  },
-  end: async () => {}
-};
-
-const mockDb = {
-  select: () => ({ from: () => [] }),
-  insert: () => ({ values: () => [] }),
-  update: () => ({ set: () => ({ where: () => [] }) }),
-  delete: () => ({ where: () => [] })
-};
-
-export const pool = process.env.DATABASE_URL 
-  ? new Pool({
-      connectionString: process.env.DATABASE_URL,
-      ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
-    })
-  : mockPool;
-
-export const db = process.env.DATABASE_URL 
-  ? drizzle(pool as Pool, { schema })
-  : mockDb;
+// Remove database connection code from frontend - this should only be on the server
+// Frontend should only make API calls to the backend
 
 type AuthContextType = {
   user: User | null;

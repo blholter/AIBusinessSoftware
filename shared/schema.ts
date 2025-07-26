@@ -52,6 +52,23 @@ export const applications = pgTable("applications", {
   icon: varchar("icon").notNull(),
   rating: integer("rating").default(0),
   downloads: integer("downloads").default(0),
+  featured: boolean("featured").default(false),
+  status: varchar("status").default("active"), // active, inactive, draft
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Blog posts table for SEO
+export const blogPosts = pgTable("blog_posts", {
+  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+  title: varchar("title").notNull(),
+  slug: varchar("slug").unique().notNull(),
+  content: text("content").notNull(),
+  excerpt: text("excerpt"),
+  featuredImage: varchar("featured_image"),
+  author: varchar("author").notNull(),
+  status: varchar("status").default("draft"), // draft, published, archived
+  publishedAt: timestamp("published_at"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -93,6 +110,12 @@ export const insertApplicationSchema = createInsertSchema(applications).omit({
   updatedAt: true,
 });
 
+export const insertBlogPostSchema = createInsertSchema(blogPosts).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
 export const insertApiKeySchema = createInsertSchema(userApiKeys).omit({
   id: true,
   userId: true,
@@ -111,8 +134,10 @@ export const apiKeySchema = z.object({
 export type UpsertUser = typeof users.$inferInsert;
 export type User = typeof users.$inferSelect;
 export type Application = typeof applications.$inferSelect;
+export type BlogPost = typeof blogPosts.$inferSelect;
 export type UserApiKey = typeof userApiKeys.$inferSelect;
 export type InsertApplication = z.infer<typeof insertApplicationSchema>;
+export type InsertBlogPost = z.infer<typeof insertBlogPostSchema>;
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type InsertApiKey = z.infer<typeof insertApiKeySchema>;
 export type ApiKeyData = z.infer<typeof apiKeySchema>;

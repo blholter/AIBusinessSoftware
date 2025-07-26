@@ -14,6 +14,7 @@ import {
   enhancedAuth, 
   auditLog 
 } from "./security";
+import { setupAdminRoutes } from "./admin-routes";
 
 // Legacy authentication middleware (keeping for backward compatibility)
 const isAuthenticated = (req: any, res: any, next: any) => {
@@ -31,9 +32,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Setup authentication
   setupAuth(app);
+  
+  // Setup admin routes
+  setupAdminRoutes(app);
 
   // Health check endpoint for Railway
-  app.get('/', (req, res) => {
+  app.get('/api/health', (req, res) => {
     res.json({ 
       status: 'ok', 
       message: 'Server is running',
@@ -59,11 +63,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get all applications (for now, return empty array as placeholder)
+  // Get all applications
   app.get('/api/applications', async (req, res) => {
     try {
-      // TODO: Implement actual application storage
-      const applications: any[] = [];
+      const applications = await storage.getAllApplications();
       res.json(applications);
     } catch (error) {
       console.error("Error fetching applications:", error);

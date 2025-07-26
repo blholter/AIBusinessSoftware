@@ -1,4 +1,4 @@
-import { users, userApiKeys, type User, type InsertUser, type UpsertUser, type UserApiKey, type InsertApiKey } from "@shared/schema";
+import { users, userApiKeys, applications, blogPosts, type User, type InsertUser, type UpsertUser, type UserApiKey, type InsertApiKey, type Application, type InsertApplication, type BlogPost, type InsertBlogPost } from "@shared/schema";
 import { db } from "./db";
 import { eq } from "drizzle-orm";
 
@@ -17,6 +17,22 @@ export interface IStorage {
   updateApiKey(keyId: number, updates: Partial<InsertApiKey>): Promise<UserApiKey>;
   deleteApiKey(keyId: number): Promise<void>;
   getApiKey(keyId: number): Promise<UserApiKey | undefined>;
+  
+  // Applications methods
+  getAllApplications(): Promise<Application[]>;
+  getApplication(id: number): Promise<Application | undefined>;
+  createApplication(app: InsertApplication): Promise<Application>;
+  updateApplication(id: number, updates: Partial<InsertApplication>): Promise<Application>;
+  deleteApplication(id: number): Promise<void>;
+  
+  // Blog posts methods
+  getAllBlogPosts(): Promise<BlogPost[]>;
+  getPublishedBlogPosts(): Promise<BlogPost[]>;
+  getBlogPost(id: number): Promise<BlogPost | undefined>;
+  getBlogPostBySlug(slug: string): Promise<BlogPost | undefined>;
+  createBlogPost(post: InsertBlogPost): Promise<BlogPost>;
+  updateBlogPost(id: number, updates: Partial<InsertBlogPost>): Promise<BlogPost>;
+  deleteBlogPost(id: number): Promise<void>;
 }
 
 // Database storage implementation
@@ -117,6 +133,77 @@ export class DatabaseStorage implements IStorage {
       .from(userApiKeys)
       .where(eq(userApiKeys.id, keyId));
     return key || undefined;
+  }
+
+  // Applications methods
+  async getAllApplications(): Promise<Application[]> {
+    return await db.select().from(applications);
+  }
+
+  async getApplication(id: number): Promise<Application | undefined> {
+    const [app] = await db.select().from(applications).where(eq(applications.id, id));
+    return app || undefined;
+  }
+
+  async createApplication(app: InsertApplication): Promise<Application> {
+    const [newApp] = await db.insert(applications).values(app).returning();
+    return newApp;
+  }
+
+  async updateApplication(id: number, updates: Partial<InsertApplication>): Promise<Application> {
+    const [updatedApp] = await db
+      .update(applications)
+      .set({
+        ...updates,
+        updatedAt: new Date(),
+      })
+      .where(eq(applications.id, id))
+      .returning();
+    return updatedApp;
+  }
+
+  async deleteApplication(id: number): Promise<void> {
+    await db.delete(applications).where(eq(applications.id, id));
+  }
+
+  // Blog posts methods
+  async getAllBlogPosts(): Promise<BlogPost[]> {
+    return await db.select().from(blogPosts);
+  }
+
+  async getPublishedBlogPosts(): Promise<BlogPost[]> {
+    return await db.select().from(blogPosts).where(eq(blogPosts.status, "published"));
+  }
+
+  async getBlogPost(id: number): Promise<BlogPost | undefined> {
+    const [post] = await db.select().from(blogPosts).where(eq(blogPosts.id, id));
+    return post || undefined;
+  }
+
+  async getBlogPostBySlug(slug: string): Promise<BlogPost | undefined> {
+    const [post] = await db.select().from(blogPosts).where(eq(blogPosts.slug, slug));
+    return post || undefined;
+  }
+
+  async createBlogPost(post: InsertBlogPost): Promise<BlogPost> {
+    const [newPost] = await db.insert(blogPosts).values(post).returning();
+    return newPost;
+  }
+
+  async updateBlogPost(id: number, updates: Partial<InsertBlogPost>): Promise<BlogPost> {
+    const [updatedPost] = await db
+      .update(blogPosts)
+      .set({
+        ...updates,
+        updatedAt: new Date(),
+      })
+      .where(eq(blogPosts.id, id))
+      .returning();
+    return updatedPost;
+  }
+
+  async deleteBlogPost(id: number): Promise<void> {
+    await db.delete(blogPosts).where(eq(blogPosts.id, id));
   }
 }
 

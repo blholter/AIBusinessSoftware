@@ -50,9 +50,19 @@ app.use((req, res, next) => {
   // importantly only setup vite in development and after
   // setting up all the other routes so the catch-all route
   // doesn't interfere with the other routes
-  if (app.get("env") === "development") {
+  const isDevelopment = process.env.NODE_ENV === "development";
+  console.log(`NODE_ENV: ${process.env.NODE_ENV}, isDevelopment: ${isDevelopment}`);
+  
+  // Force production mode if NODE_ENV is not set (Railway default)
+  if (!process.env.NODE_ENV) {
+    console.log('NODE_ENV not set, defaulting to production mode');
+  }
+  
+  if (isDevelopment) {
+    console.log('Setting up Vite development server...');
     await setupVite(app, server);
   } else {
+    console.log('Setting up static file serving...');
     serveStatic(app);
   }
 
@@ -65,6 +75,8 @@ app.use((req, res, next) => {
   // Log the port being used for debugging
   console.log(`Environment PORT: ${process.env.PORT}`);
   console.log(`Using port: ${port}`);
+  console.log(`Current working directory: ${process.cwd()}`);
+  console.log(`Node version: ${process.version}`);
   
   server.listen({
     port,

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useAuth } from "@/hooks/use-auth";
+import { useSupabaseAuth } from "@/hooks/use-supabase-auth";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
@@ -15,7 +15,7 @@ import { isUnauthorizedError } from "@/lib/authUtils";
 
 export default function Settings() {
   const { toast } = useToast();
-  const { user, isLoading, logoutMutation } = useAuth();
+  const { user, isLoading, signOut } = useSupabaseAuth();
   const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState("profile");
   const [formData, setFormData] = useState({
@@ -32,11 +32,11 @@ export default function Settings() {
   useEffect(() => {
     if (user) {
       setFormData({
-        firstName: user.firstName || "",
-        lastName: user.lastName || "",
-        bio: user.bio || "",
-        location: user.location || "",
-        website: user.website || "",
+        firstName: user.user_metadata?.firstName || "",
+        lastName: user.user_metadata?.lastName || "",
+        bio: user.user_metadata?.bio || "",
+        location: user.user_metadata?.location || "",
+        website: user.user_metadata?.website || "",
       });
     }
   }, [user]);
@@ -78,8 +78,8 @@ export default function Settings() {
     updateProfileMutation.mutate(formData);
   };
 
-  const handleLogout = () => {
-    logoutMutation.mutate();
+  const handleLogout = async () => {
+    await signOut();
   };
 
   if (isLoading) {
@@ -190,9 +190,9 @@ export default function Settings() {
                   <Label className="text-sm font-medium text-gray-700 mb-2">Profile Picture</Label>
                   <div className="flex items-center mt-2">
                     <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center mr-4">
-                      {user?.profileImageUrl ? (
-                        <img 
-                          src={user.profileImageUrl} 
+                                      {user?.user_metadata?.avatar_url ? (
+                  <img
+                    src={user.user_metadata.avatar_url} 
                           alt="Profile" 
                           className="w-16 h-16 rounded-full object-cover"
                         />

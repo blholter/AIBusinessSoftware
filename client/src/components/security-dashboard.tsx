@@ -3,10 +3,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Shield, AlertTriangle, CheckCircle, Key, Lock, Eye, EyeOff } from "lucide-react";
-import { useAuth } from "@/hooks/use-auth";
+import { useSupabaseAuth } from "@/hooks/use-supabase-auth";
 
 export function SecurityDashboard() {
-  const { user } = useAuth();
+  const { user } = useSupabaseAuth();
   const [showDetails, setShowDetails] = useState(false);
 
   const securityFeatures = [
@@ -179,12 +179,8 @@ export function SecurityDashboard() {
                   <span className="font-mono">{user?.email}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Username:</span>
-                  <span className="font-mono">{user?.username}</span>
-                </div>
-                <div className="flex justify-between">
                   <span className="text-gray-600">Auth Method:</span>
-                  <Badge variant="outline">{user?.authProvider || 'Email'}</Badge>
+                  <Badge variant="outline">{user?.app_metadata?.provider || 'Email'}</Badge>
                 </div>
               </div>
             </div>

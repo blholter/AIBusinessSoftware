@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useAuth } from "@/hooks/use-auth";
+import { useSupabaseAuth } from "@/hooks/use-supabase-auth";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -109,21 +109,21 @@ const mockApps = [
 ];
 
 export default function Marketplace() {
-  const { user, logoutMutation } = useAuth();
+  const { user, signOut } = useSupabaseAuth();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [sortBy, setSortBy] = useState("popular");
 
-  const { data: applications = mockApps, error } = useQuery({
+  const { data: applications, error } = useQuery({
     queryKey: ["/api/applications"],
     enabled: !!user,
   });
 
   // Always use mockApps for now since the API returns empty array
-  const apps = applications && applications.length > 0 ? applications : mockApps;
+  const apps = (applications && Array.isArray(applications) && applications.length > 0) ? applications : mockApps;
 
-  const handleLogout = () => {
-    logoutMutation.mutate();
+  const handleLogout = async () => {
+    await signOut();
   };
 
   const categories = [
@@ -176,10 +176,18 @@ export default function Marketplace() {
 
             <div className="flex items-center space-x-4">
               <span className="text-sm text-gray-600">
-                Welcome, {user?.firstName || user?.email}
+                Welcome, {user?.email}
               </span>
               <Button variant="ghost" size="sm" onClick={() => window.location.href = "/settings"}>
                 <Settings className="h-4 w-4" />
+              </Button>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => window.location.href = '/admin'}
+                className="bg-purple-50 text-purple-700 border-purple-200 hover:bg-purple-100"
+              >
+                Admin
               </Button>
               <Button variant="outline" size="sm" onClick={handleLogout}>
                 <LogOut className="h-4 w-4" />

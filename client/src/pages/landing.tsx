@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Bot, ArrowRight, Zap, Shield, Globe } from "lucide-react";
+import BlogSection from "@/components/blog-section";
 
 export default function Landing() {
   return (
@@ -67,7 +68,7 @@ export default function Landing() {
         </div>
 
         {/* CTA Section */}
-        <div className="text-center">
+        <div className="text-center mb-16">
           <Card className="max-w-2xl mx-auto">
             <CardContent className="pt-8 pb-8">
               <h2 className="text-2xl font-bold mb-4">Ready to Get Started?</h2>
@@ -84,6 +85,9 @@ export default function Landing() {
           </Card>
         </div>
       </div>
+
+      {/* Blog Section for SEO */}
+      <BlogSection />
     </div>
   );
 }
