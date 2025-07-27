@@ -46,13 +46,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
     });
   });
 
-  // Admin check endpoint for Supabase auth
+  // Admin check endpoint - now properly protected
   app.post('/api/admin/check', async (req, res) => {
     try {
+      // Check if user is authenticated
+      if (!req.isAuthenticated()) {
+        return res.status(401).json({ error: "Authentication required" });
+      }
+
       const { email } = req.body;
       
       if (!email) {
         return res.status(400).json({ error: "Email is required" });
+      }
+      
+      // Verify the email matches the authenticated user
+      if (req.user.email !== email) {
+        return res.status(403).json({ error: "Email mismatch" });
       }
       
       const adminEmails = process.env.ADMIN_EMAILS?.split(',').map(email => email.trim()) || [];

@@ -6,6 +6,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { SupabaseAuthProvider } from "@/hooks/use-supabase-auth";
 import { ProtectedRoute } from "@/lib/protected-route";
+import { AdminProtectedRoute } from "@/lib/admin-protected-route";
 import NotFound from "@/pages/not-found";
 import Landing from "@/pages/landing";
 import Marketplace from "@/pages/marketplace";
@@ -20,7 +21,7 @@ function Router() {
       <Route path="/auth/callback" component={AuthPage} />
       <ProtectedRoute path="/" component={Marketplace} />
       <ProtectedRoute path="/settings" component={Settings} />
-      <ProtectedRoute path="/admin" component={AdminDashboard} />
+      <AdminProtectedRoute path="/admin" component={AdminDashboard} />
       <Route component={NotFound} />
     </Switch>
   );

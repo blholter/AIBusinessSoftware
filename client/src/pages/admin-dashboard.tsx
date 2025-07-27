@@ -65,59 +65,9 @@ export default function AdminDashboard() {
   const [jsonInput, setJsonInput] = useState("");
   const [showAppForm, setShowAppForm] = useState(false);
   const [showPostForm, setShowPostForm] = useState(false);
-  const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
-  const [isCheckingAdmin, setIsCheckingAdmin] = useState(true);
 
-  // Check admin status
-  useEffect(() => {
-    const checkAdminStatus = async () => {
-      if (!user?.email) {
-        setIsAdmin(false);
-        setIsCheckingAdmin(false);
-        return;
-      }
-
-      try {
-        const response = await fetch('/api/admin/check', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: user.email })
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          setIsAdmin(data.isAdmin);
-          
-          if (!data.isAdmin) {
-            toast({
-              title: "Access Denied",
-              description: "You don't have admin privileges.",
-              variant: "destructive",
-            });
-          }
-        } else {
-          setIsAdmin(false);
-          toast({
-            title: "Error",
-            description: "Failed to verify admin status.",
-            variant: "destructive",
-          });
-        }
-      } catch (error) {
-        console.error('Error checking admin status:', error);
-        setIsAdmin(false);
-        toast({
-          title: "Error",
-          description: "Failed to verify admin status.",
-          variant: "destructive",
-        });
-      } finally {
-        setIsCheckingAdmin(false);
-      }
-    };
-
-    checkAdminStatus();
-  }, [user?.email, toast]);
+  // Remove the admin check logic since it's now handled by AdminProtectedRoute
+  // The component will only render if the user is confirmed to be an admin
 
   // Form states
   const [appForm, setAppForm] = useState({
@@ -337,40 +287,6 @@ export default function AdminDashboard() {
     convertJsonMutation.mutate(jsonInput);
   };
 
-  if (!user) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-red-600 mb-4">Access Denied</h1>
-          <p className="text-gray-600">You need to be logged in to access the admin dashboard.</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (isCheckingAdmin) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-gray-600">Verifying admin access...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (!isAdmin) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-red-600 mb-4">Access Denied</h1>
-          <p className="text-gray-600">You don't have admin privileges.</p>
-          <p className="text-sm text-gray-500 mt-2">Contact an administrator if you believe this is an error.</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -394,7 +310,7 @@ export default function AdminDashboard() {
             </div>
             <div className="flex items-center space-x-4">
               <span className="text-sm text-gray-600">
-                Admin: {user.email}
+                Admin: {user?.email}
               </span>
               <Button variant="outline" size="sm" onClick={() => signOut()}>
                 Logout
