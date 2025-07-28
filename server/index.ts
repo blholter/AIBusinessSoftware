@@ -3,6 +3,7 @@ import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 
+// FORCE RAILWAY REBUILD - Latest version with all fixes applied
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -12,7 +13,8 @@ app.get('/debug', (req, res) => {
   res.json({ 
     message: "Server is working!", 
     timestamp: new Date().toISOString(),
-    env: process.env.NODE_ENV
+    env: process.env.NODE_ENV,
+    version: "FINAL_FIX_APPLIED"
   });
 });
 
