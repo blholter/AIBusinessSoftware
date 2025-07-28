@@ -46,7 +46,7 @@ export async function setupVite(app: Express, server: Server) {
 
     try {
       const clientTemplate = path.resolve(
-        import.meta.dirname,
+        import.meta.dirname || process.cwd(),
         "..",
         "client",
         "index.html",
@@ -68,9 +68,21 @@ export async function setupVite(app: Express, server: Server) {
 }
 
 export function serveStatic(app: Express) {
-  const distPath = path.resolve(import.meta.dirname, "public");
+  // Fix for production build - import.meta.dirname is undefined
+  const baseDir = import.meta.dirname || process.cwd();
+  const distPath = path.resolve(baseDir, "public");
 
   if (!fs.existsSync(distPath)) {
+    // Try alternative path for production
+    const altDistPath = path.resolve(process.cwd(), "dist", "public");
+    if (fs.existsSync(altDistPath)) {
+      app.use(express.static(altDistPath));
+      app.use("*", (_req, res) => {
+        res.sendFile(path.resolve(altDistPath, "index.html"));
+      });
+      return;
+    }
+    
     throw new Error(
       `Could not find the build directory: ${distPath}, make sure to build the client first`,
     );
